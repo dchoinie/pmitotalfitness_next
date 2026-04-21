@@ -101,10 +101,10 @@ export default async function MembershipPage() {
                     Download and fill out our membership registration form, then bring it in during open hours or email it to us.
                   </p>
                   <Button asChild className="w-full font-heading uppercase tracking-wide">
-                    <Link href="/membership/form">
+                    <a href="/Member_Registration.pdf" download>
                       <FileText className="size-4" />
-                      View & Print Registration Form
-                    </Link>
+                      Download Registration Form
+                    </a>
                   </Button>
                 </CardContent>
               </Card>
