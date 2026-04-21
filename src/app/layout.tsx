@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { Footer } from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -23,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       className={cn("h-full antialiased", inter.variable, oswald.variable, geistMono.variable)}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <Header />
+        <HeaderWrapper />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

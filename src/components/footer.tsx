@@ -54,10 +54,6 @@ export function Footer() {
                 <a href="tel:5073624227" className="hover:text-primary transition-colors">(507) 362-4227</a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="size-4 shrink-0 text-primary" />
-                <a href="tel:5073628469" className="hover:text-primary transition-colors">(507) 362-8469 (Cell)</a>
-              </li>
-              <li className="flex items-center gap-2">
                 <Mail className="size-4 shrink-0 text-primary" />
                 <a href="mailto:pmi.totalfitness@hotmail.com" className="hover:text-primary transition-colors">pmi.totalfitness@hotmail.com</a>
               </li>

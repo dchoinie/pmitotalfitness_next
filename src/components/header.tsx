@@ -12,20 +12,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import type { NavItem } from "@/lib/queries"
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/membership", label: "Membership" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-]
-
-export function Header() {
+export function Header({ navLinks }: { navLinks: NavItem[] }) {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Dumbbell className="size-6 text-primary" />

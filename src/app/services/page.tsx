@@ -5,14 +5,65 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Sun, Heart, Users, ChevronRight } from "lucide-react"
+import { getServicesPageData, type TanningRateRow, type RateRow } from "@/lib/queries"
 
-export default function ServicesPage() {
+function TanningRateTable({ headers, rows }: { headers: string[]; rows: TanningRateRow[] }) {
+  return (
+    <div className="text-sm">
+      <div className="grid grid-cols-3 gap-2 font-semibold uppercase tracking-wide text-xs text-muted-foreground mb-2">
+        {headers.map((h, i) => <span key={i} className={i > 0 ? "text-center" : ""}>{h}</span>)}
+      </div>
+      <div className="space-y-2">
+        {rows.map((row, i) => (
+          <div key={row.label}>
+            <div className="grid grid-cols-3 gap-2 items-center">
+              <span className="text-muted-foreground">{row.label}</span>
+              <span className="text-center font-semibold text-primary">{row.bed}</span>
+              <span className="text-center font-semibold text-primary">{row.standup}</span>
+            </div>
+            {i < rows.length - 1 && <Separator className="mt-2" />}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function SimpleRateTable({ headers, rows }: { headers: string[]; rows: RateRow[] }) {
+  return (
+    <div className="text-sm">
+      <div className="grid grid-cols-2 gap-2 font-semibold uppercase tracking-wide text-xs text-muted-foreground mb-2">
+        {headers.map((h, i) => <span key={i} className={i > 0 ? "text-center" : ""}>{h}</span>)}
+      </div>
+      <div className="space-y-2">
+        {rows.map((row, i) => (
+          <div key={row.label}>
+            <div className="grid grid-cols-2 gap-2 items-center">
+              <span className="text-muted-foreground">{row.label}</span>
+              <span className="text-center font-semibold text-primary">{row.rate}</span>
+            </div>
+            {i < rows.length - 1 && <Separator className="mt-2" />}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default async function ServicesPage() {
+  const data = await getServicesPageData()
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-muted-foreground">
+        Services page content not found in Sanity.
+      </div>
+    )
+  }
+
   return (
     <>
-      <PageHeader
-        title="Services"
-        subtitle="Member discounts on tanning, massage, personal training, and more."
-      />
+      <PageHeader title={data.pageTitle} subtitle={data.pageSubtitle} />
 
       {/* Tanning */}
       <section id="tanning" className="py-16 md:py-24 scroll-mt-16">
@@ -22,13 +73,12 @@ export default function ServicesPage() {
               <Sun className="size-6 text-primary" />
             </div>
             <div>
-              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">Tanning</h2>
-              <p className="text-muted-foreground text-sm">Bed & Stand-Up options available</p>
+              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">{data.tanningHeading}</h2>
+              <p className="text-muted-foreground text-sm">{data.tanningSubtitle}</p>
             </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Member Rates */}
             <Card>
               <CardHeader className="border-b">
                 <div className="flex items-center justify-between">
@@ -37,19 +87,10 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["", "Bed", "Stand-Up"]}
-                  rows={[
-                    ["Single Session", "$3.50", "$4.50"],
-                    ["10 Sessions", "$30.00", "$40.00"],
-                    ["1 Month Unlimited", "$40.00", "$50.00"],
-                    ["Year Unlimited", "$17.00/mo", "$20.00/mo"],
-                  ]}
-                />
+                <TanningRateTable headers={["", "Bed", "Stand-Up"]} rows={data.tanningMemberRates} />
               </CardContent>
             </Card>
 
-            {/* Public Rates */}
             <Card>
               <CardHeader className="border-b">
                 <div className="flex items-center justify-between">
@@ -58,15 +99,7 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["", "Bed", "Stand-Up"]}
-                  rows={[
-                    ["Single Session", "$4.50", "$6.00"],
-                    ["10 Sessions", "$38.00", "$48.00"],
-                    ["1 Month Unlimited", "$45.00", "$58.00"],
-                    ["Year Unlimited", "—", "—"],
-                  ]}
-                />
+                <TanningRateTable headers={["", "Bed", "Stand-Up"]} rows={data.tanningPublicRates} />
               </CardContent>
             </Card>
           </div>
@@ -83,8 +116,8 @@ export default function ServicesPage() {
               <Heart className="size-6 text-primary" />
             </div>
             <div>
-              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">Massage</h2>
-              <p className="text-muted-foreground text-sm">30-minute and 1-hour sessions</p>
+              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">{data.massageHeading}</h2>
+              <p className="text-muted-foreground text-sm">{data.massageSubtitle}</p>
             </div>
           </div>
 
@@ -97,13 +130,7 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["Duration", "Rate"]}
-                  rows={[
-                    ["½ Hour", "$30.00"],
-                    ["1 Hour", "$50.00"],
-                  ]}
-                />
+                <SimpleRateTable headers={["Duration", "Rate"]} rows={data.massageMemberRates} />
               </CardContent>
             </Card>
 
@@ -115,13 +142,7 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["Duration", "Rate"]}
-                  rows={[
-                    ["½ Hour", "$35.00"],
-                    ["1 Hour", "$55.00"],
-                  ]}
-                />
+                <SimpleRateTable headers={["Duration", "Rate"]} rows={data.massagePublicRates} />
               </CardContent>
             </Card>
           </div>
@@ -138,8 +159,8 @@ export default function ServicesPage() {
               <Users className="size-6 text-primary" />
             </div>
             <div>
-              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">Personal Training</h2>
-              <p className="text-muted-foreground text-sm">Individual instruction — multi-session packages & group rates available</p>
+              <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">{data.trainingHeading}</h2>
+              <p className="text-muted-foreground text-sm">{data.trainingSubtitle}</p>
             </div>
           </div>
 
@@ -152,17 +173,10 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["Sessions", "Rate"]}
-                  rows={[
-                    ["1 Hour", "$35.00/hr"],
-                    ["2 Hours", "$65.00"],
-                    ["3 Hours", "$90.00"],
-                    ["4 Hours", "$112.00"],
-                    ["8 Hours", "$200.00"],
-                  ]}
-                />
-                <p className="text-xs text-muted-foreground mt-4">Multi-session packages & group rates available. Contact us for details.</p>
+                <SimpleRateTable headers={["Sessions", "Rate"]} rows={data.trainingMemberRates} />
+                {data.trainingMemberNote && (
+                  <p className="text-xs text-muted-foreground mt-4">{data.trainingMemberNote}</p>
+                )}
               </CardContent>
             </Card>
 
@@ -174,17 +188,10 @@ export default function ServicesPage() {
                 </div>
               </CardHeader>
               <CardContent className="pt-4">
-                <RateTable
-                  headers={["Sessions", "Rate"]}
-                  rows={[
-                    ["1 Hour", "$45.00/hr"],
-                    ["2 Hours", "$—"],
-                    ["3 Hours", "$—"],
-                    ["4 Hours", "$—"],
-                    ["8 Hours", "$—"],
-                  ]}
-                />
-                <p className="text-xs text-muted-foreground mt-4">Contact us for public multi-session and group training packages.</p>
+                <SimpleRateTable headers={["Sessions", "Rate"]} rows={data.trainingPublicRates} />
+                {data.trainingPublicNote && (
+                  <p className="text-xs text-muted-foreground mt-4">{data.trainingPublicNote}</p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -194,8 +201,8 @@ export default function ServicesPage() {
       {/* CTA */}
       <section className="py-16 bg-zinc-900 text-white">
         <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">Ready to Get Started?</h2>
-          <p className="mt-4 text-zinc-400">Become a member and unlock discounted rates on all our services.</p>
+          <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">{data.ctaHeading}</h2>
+          <p className="mt-4 text-zinc-400">{data.ctaSubheading}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Button asChild className="font-heading uppercase tracking-wide px-8">
               <Link href="/membership">
@@ -209,28 +216,5 @@ export default function ServicesPage() {
         </div>
       </section>
     </>
-  )
-}
-
-function RateTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
-  return (
-    <div className="text-sm">
-      <div className={`grid gap-2 font-semibold uppercase tracking-wide text-xs text-muted-foreground mb-2`} style={{ gridTemplateColumns: `repeat(${headers.length}, 1fr)` }}>
-        {headers.map((h, i) => <span key={i} className={i > 0 ? "text-center" : ""}>{h}</span>)}
-      </div>
-      <div className="space-y-2">
-        {rows.map((row, ri) => (
-          <div key={ri}>
-            <div className={`grid gap-2 items-center`} style={{ gridTemplateColumns: `repeat(${headers.length}, 1fr)` }}>
-              <span className="text-muted-foreground">{row[0]}</span>
-              {row.slice(1).map((cell, ci) => (
-                <span key={ci} className="text-center font-semibold text-primary">{cell}</span>
-              ))}
-            </div>
-            {ri < rows.length - 1 && <Separator className="mt-2" />}
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }
