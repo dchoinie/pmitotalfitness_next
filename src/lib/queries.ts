@@ -75,6 +75,15 @@ export type ContactPageData = {
   pageSubtitle: string
   formHeading: string
   infoHeading: string
+  address: string
+  addressLine2: string
+  phone1: string
+  phone1Display: string
+  phone2: string
+  phone2Display: string
+  email: string
+  hours: HourEntry[]
+  hoursNote: string
 }
 
 export type TanningRateRow = { label: string; bed: string; standup: string }
@@ -179,7 +188,12 @@ export async function getAboutPageData(): Promise<AboutPageData | null> {
 
 export async function getContactPageData(): Promise<ContactPageData | null> {
   return sanityClient.fetch<ContactPageData | null>(
-    `*[_type == "contactPage"][0]{ pageTitle, pageSubtitle, formHeading, infoHeading }`,
+    `*[_type == "contactPage"][0]{
+      pageTitle, pageSubtitle, formHeading, infoHeading,
+      address, addressLine2,
+      phone1, phone1Display, phone2, phone2Display,
+      email, hours, hoursNote
+    }`,
     {},
     fetchOpts
   )
