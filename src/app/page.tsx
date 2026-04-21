@@ -243,10 +243,6 @@ export default async function Home() {
             <a href={`tel:${data.locationPhone1}`} className="hover:text-primary transition-colors">
               {data.locationPhone1Display}
             </a>
-            {" · "}
-            <a href={`tel:${data.locationPhone2}`} className="hover:text-primary transition-colors">
-              {data.locationPhone2Display}
-            </a>
           </p>
           <div className="mt-8">
             <Button asChild className="font-heading uppercase tracking-wide px-8">

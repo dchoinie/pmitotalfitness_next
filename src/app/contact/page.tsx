@@ -50,27 +50,17 @@ export default async function ContactPage() {
                     </div>
                   )}
 
-                  {(site?.phone1 || site?.phone2) && (
+                  {site?.phone1 && (
                     <div className="flex items-start gap-3">
                       <Phone className="size-5 text-primary mt-0.5 shrink-0" />
                       <div>
                         <p className="font-semibold text-sm">Phone</p>
-                        {site?.phone1 && (
-                          <a
-                            href={`tel:${site.phone1}`}
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors block"
-                          >
-                            {site.phone1Display ?? site.phone1}
-                          </a>
-                        )}
-                        {site?.phone2 && (
-                          <a
-                            href={`tel:${site.phone2}`}
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors block"
-                          >
-                            {site.phone2Display ?? site.phone2}
-                          </a>
-                        )}
+                        <a
+                          href={`tel:${site.phone1}`}
+                          className="text-sm text-muted-foreground hover:text-primary transition-colors block"
+                        >
+                          {site.phone1Display ?? site.phone1}
+                        </a>
                       </div>
                     </div>
                   )}

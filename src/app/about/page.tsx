@@ -133,14 +133,6 @@ export default async function AboutPage() {
                           </a>
                         </li>
                       )}
-                      {site.phone2 && (
-                        <li className="flex items-center gap-3">
-                          <Phone className="size-4 text-primary shrink-0" />
-                          <a href={`tel:${site.phone2}`} className="hover:text-primary transition-colors">
-                            {site.phone2Display ?? site.phone2}
-                          </a>
-                        </li>
-                      )}
                       {site.email && (
                         <li className="flex items-center gap-3">
                           <Mail className="size-4 text-primary shrink-0" />
