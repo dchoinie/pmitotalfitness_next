@@ -11,43 +11,46 @@ import {
   Dumbbell,
   Users,
   Heart,
+  Star,
+  Zap,
+  Sun,
   ChevronRight,
+  type LucideIcon,
 } from "lucide-react"
+import { getAboutPageData, getSiteSettings } from "@/lib/queries"
 
-const hours = [
-  { day: "Monday", time: "8:00 AM – 5:00 PM", open: true },
-  { day: "Tuesday", time: "Closed", open: false },
-  { day: "Wednesday", time: "8:00 AM – 5:00 PM", open: true },
-  { day: "Thursday", time: "Closed", open: false },
-  { day: "Friday", time: "8:00 AM – 5:00 PM", open: true },
-  { day: "Saturday", time: "9:00 AM – 1:00 PM", open: true },
-  { day: "Sunday", time: "Closed", open: false },
+const ICON_MAP: Record<string, LucideIcon> = {
+  Dumbbell,
+  Users,
+  Heart,
+  Star,
+  Zap,
+  Sun,
+}
+
+const DEFAULT_PARAGRAPHS = [
+  "PMI Total Fitness has been serving the Waterville, MN area as a dedicated fitness facility for the local community. We believe that access to quality fitness resources shouldn't require a long drive to a big city.",
+  "We offer a full range of cardio and strength equipment, personal training, tanning, and massage services — everything you need in one convenient location. Our staff is here to make sure you feel comfortable and confident every step of the way.",
+  "Whether you're just starting out or looking to take your training to the next level, PMI Total Fitness has a membership and program for you.",
 ]
 
-const values = [
-  {
-    icon: Dumbbell,
-    title: "Quality Equipment",
-    description: "Full range of aerobic equipment, weight machines, and free weights to support every fitness goal.",
-  },
-  {
-    icon: Users,
-    title: "Personal Attention",
-    description: "Every new member gets a personal training session and guided equipment orientation.",
-  },
-  {
-    icon: Heart,
-    title: "Community First",
-    description: "We're a small-town gym that takes pride in knowing our members and supporting their goals.",
-  },
+const DEFAULT_VALUES = [
+  { iconName: "Dumbbell", title: "Quality Equipment", description: "Full range of aerobic equipment, weight machines, and free weights to support every fitness goal." },
+  { iconName: "Users", title: "Personal Attention", description: "Every new member gets a personal training session and guided equipment orientation." },
+  { iconName: "Heart", title: "Community First", description: "We're a small-town gym that takes pride in knowing our members and supporting their goals." },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [about, site] = await Promise.all([getAboutPageData(), getSiteSettings()])
+
+  const paragraphs = about?.bodyParagraphs?.length ? about.bodyParagraphs : DEFAULT_PARAGRAPHS
+  const values = about?.values?.length ? about.values : DEFAULT_VALUES
+
   return (
     <>
       <PageHeader
-        title="About Us"
-        subtitle="Your local fitness center in the heart of Waterville, MN."
+        title={about?.pageTitle ?? "About Us"}
+        subtitle={about?.pageSubtitle ?? "Your local fitness center in the heart of Waterville, MN."}
       />
 
       {/* About Content */}
@@ -56,28 +59,17 @@ export default function AboutPage() {
           <div className="grid gap-12 md:grid-cols-2 items-start">
             <div>
               <h2 className="font-heading text-3xl font-bold uppercase tracking-widest md:text-4xl">
-                Built for This Community
+                {about?.bodySectionHeading ?? "Built for This Community"}
               </h2>
               <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  PMI Total Fitness has been serving the Waterville, MN area as a dedicated fitness facility
-                  for the local community. We believe that access to quality fitness resources shouldn&apos;t require
-                  a long drive to a big city.
-                </p>
-                <p>
-                  We offer a full range of cardio and strength equipment, personal training, tanning, and massage
-                  services — everything you need in one convenient location. Our staff is here to make sure you feel
-                  comfortable and confident every step of the way.
-                </p>
-                <p>
-                  Whether you&apos;re just starting out or looking to take your training to the next level, PMI Total Fitness
-                  has a membership and program for you.
-                </p>
+                {paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
               </div>
               <div className="mt-8">
                 <Button asChild className="font-heading uppercase tracking-wide">
-                  <Link href="/membership">
-                    View Membership Options <ChevronRight className="size-4" />
+                  <Link href={about?.ctaButtonHref ?? "/membership"}>
+                    {about?.ctaButtonLabel ?? "View Membership Options"} <ChevronRight className="size-4" />
                   </Link>
                 </Button>
               </div>
@@ -85,64 +77,82 @@ export default function AboutPage() {
 
             {/* Hours & Contact */}
             <div className="space-y-6">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Clock className="size-5 text-primary" />
-                    <h3 className="font-heading font-bold uppercase tracking-wide">Open Hours</h3>
-                  </div>
-                  <div className="space-y-0">
-                    {hours.map((entry, i) => (
-                      <div key={entry.day}>
-                        <div className="flex items-center justify-between py-2">
-                          <span className={`text-sm font-medium ${!entry.open ? "text-muted-foreground" : ""}`}>
-                            {entry.day}
-                          </span>
-                          <span className={`text-sm ${entry.open ? "text-primary font-semibold" : "text-muted-foreground"}`}>
-                            {entry.time}
-                          </span>
-                        </div>
-                        {i < hours.length - 1 && <Separator />}
-                      </div>
-                    ))}
-                    <div className="pt-3 border-t mt-1">
-                      <p className="text-xs text-muted-foreground text-center">* Or by appointment</p>
+              {site?.hours && site.hours.length > 0 && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Clock className="size-5 text-primary" />
+                      <h3 className="font-heading font-bold uppercase tracking-wide">Open Hours</h3>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="space-y-0">
+                      {site.hours.map((entry, i) => (
+                        <div key={entry.day}>
+                          <div className="flex items-center justify-between py-2">
+                            <span className={`text-sm font-medium ${!entry.open ? "text-muted-foreground" : ""}`}>
+                              {entry.day}
+                            </span>
+                            <span className={`text-sm ${entry.open ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                              {entry.time}
+                            </span>
+                          </div>
+                          {i < site.hours.length - 1 && <Separator />}
+                        </div>
+                      ))}
+                      {site.hoursNote && (
+                        <div className="pt-3 border-t mt-1">
+                          <p className="text-xs text-muted-foreground text-center">* {site.hoursNote}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="size-5 text-primary" />
-                    <h3 className="font-heading font-bold uppercase tracking-wide">Find Us</h3>
-                  </div>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-start gap-3">
-                      <MapPin className="size-4 text-primary mt-0.5 shrink-0" />
-                      <div>
-                        <p>124 S. 2nd St.</p>
-                        <p>Waterville, MN 56096</p>
-                      </div>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <Phone className="size-4 text-primary shrink-0" />
-                      <a href="tel:5073624227" className="hover:text-primary transition-colors">(507) 362-4227</a>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <Phone className="size-4 text-primary shrink-0" />
-                      <a href="tel:5073628469" className="hover:text-primary transition-colors">(507) 362-8469 (Cell)</a>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <Mail className="size-4 text-primary shrink-0" />
-                      <a href="mailto:pmi.totalfitness@hotmail.com" className="hover:text-primary transition-colors">
-                        pmi.totalfitness@hotmail.com
-                      </a>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+              {site && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <MapPin className="size-5 text-primary" />
+                      <h3 className="font-heading font-bold uppercase tracking-wide">Find Us</h3>
+                    </div>
+                    <ul className="space-y-3 text-sm">
+                      {site.address && (
+                        <li className="flex items-start gap-3">
+                          <MapPin className="size-4 text-primary mt-0.5 shrink-0" />
+                          <div>
+                            <p>{site.address}</p>
+                            {site.addressLine2 && <p>{site.addressLine2}</p>}
+                          </div>
+                        </li>
+                      )}
+                      {site.phone1 && (
+                        <li className="flex items-center gap-3">
+                          <Phone className="size-4 text-primary shrink-0" />
+                          <a href={`tel:${site.phone1}`} className="hover:text-primary transition-colors">
+                            {site.phone1Display ?? site.phone1}
+                          </a>
+                        </li>
+                      )}
+                      {site.phone2 && (
+                        <li className="flex items-center gap-3">
+                          <Phone className="size-4 text-primary shrink-0" />
+                          <a href={`tel:${site.phone2}`} className="hover:text-primary transition-colors">
+                            {site.phone2Display ?? site.phone2}
+                          </a>
+                        </li>
+                      )}
+                      {site.email && (
+                        <li className="flex items-center gap-3">
+                          <Mail className="size-4 text-primary shrink-0" />
+                          <a href={`mailto:${site.email}`} className="hover:text-primary transition-colors">
+                            {site.email}
+                          </a>
+                        </li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
@@ -153,21 +163,24 @@ export default function AboutPage() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="text-center mb-12">
             <h2 className="font-heading text-3xl font-bold uppercase tracking-widest md:text-4xl">
-              What Sets Us Apart
+              {about?.valuesHeading ?? "What Sets Us Apart"}
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {values.map(({ icon: Icon, title, description }) => (
-              <Card key={title}>
-                <CardContent className="pt-6 space-y-3">
-                  <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="size-6 text-primary" />
-                  </div>
-                  <h3 className="font-heading font-bold uppercase tracking-wide">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {values.map(({ iconName, title, description }) => {
+              const Icon = ICON_MAP[iconName] ?? Dumbbell
+              return (
+                <Card key={title}>
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Icon className="size-6 text-primary" />
+                    </div>
+                    <h3 className="font-heading font-bold uppercase tracking-wide">{title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -175,14 +188,22 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-16 bg-zinc-900 text-white">
         <div className="mx-auto max-w-6xl px-4 text-center">
-          <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">Come Check Us Out</h2>
-          <p className="mt-4 text-zinc-400">Stop in during open hours — we&apos;d love to give you a tour.</p>
+          <h2 className="font-heading text-3xl font-bold uppercase tracking-widest">
+            {about?.closingCtaHeading ?? "Come Check Us Out"}
+          </h2>
+          <p className="mt-4 text-zinc-400">
+            {about?.closingCtaDescription ?? "Stop in during open hours — we'd love to give you a tour."}
+          </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Button asChild className="font-heading uppercase tracking-wide px-8">
-              <Link href="/contact">Get In Touch</Link>
+              <Link href={about?.closingCta1Href ?? "/contact"}>
+                {about?.closingCta1Label ?? "Get In Touch"}
+              </Link>
             </Button>
             <Button asChild variant="outline" className="font-heading uppercase tracking-wide px-8 border-zinc-600 text-white hover:bg-zinc-800">
-              <Link href="/membership">Join Now</Link>
+              <Link href={about?.closingCta2Href ?? "/membership"}>
+                {about?.closingCta2Label ?? "Join Now"}
+              </Link>
             </Button>
           </div>
         </div>

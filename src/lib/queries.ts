@@ -1,5 +1,38 @@
 import { sanityClient } from './sanity'
 
+export type SiteSettings = {
+  businessName: string
+  tagline: string
+  address: string
+  addressLine2: string
+  phone1: string
+  phone1Display: string
+  phone2: string
+  phone2Display: string
+  email: string
+  hours: HourEntry[]
+  hoursNote: string
+}
+
+export type AboutValue = { title: string; description: string; iconName: string }
+
+export type AboutPageData = {
+  pageTitle: string
+  pageSubtitle: string
+  bodySectionHeading: string
+  bodyParagraphs: string[]
+  ctaButtonLabel: string
+  ctaButtonHref: string
+  valuesHeading: string
+  values: AboutValue[]
+  closingCtaHeading: string
+  closingCtaDescription: string
+  closingCta1Label: string
+  closingCta1Href: string
+  closingCta2Label: string
+  closingCta2Href: string
+}
+
 export type NavItem = {
   label: string
   href: string
@@ -42,15 +75,6 @@ export type ContactPageData = {
   pageSubtitle: string
   formHeading: string
   infoHeading: string
-  address: string
-  addressLine2: string
-  phone1: string
-  phone1Display: string
-  phone2: string
-  phone2Display: string
-  email: string
-  hours: HourEntry[]
-  hoursNote: string
 }
 
 export type TanningRateRow = { label: string; bed: string; standup: string }
@@ -124,13 +148,38 @@ export async function getHomePageData(): Promise<HomePageData | null> {
   )
 }
 
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  return sanityClient.fetch<SiteSettings | null>(
+    `*[_type == "siteSettings"][0]{
+      businessName, tagline,
+      address, addressLine2,
+      phone1, phone1Display, phone2, phone2Display,
+      email, hours, hoursNote
+    }`,
+    {},
+    fetchOpts
+  )
+}
+
+export async function getAboutPageData(): Promise<AboutPageData | null> {
+  return sanityClient.fetch<AboutPageData | null>(
+    `*[_type == "aboutPage"][0]{
+      pageTitle, pageSubtitle,
+      bodySectionHeading, bodyParagraphs,
+      ctaButtonLabel, ctaButtonHref,
+      valuesHeading, values,
+      closingCtaHeading, closingCtaDescription,
+      closingCta1Label, closingCta1Href,
+      closingCta2Label, closingCta2Href
+    }`,
+    {},
+    fetchOpts
+  )
+}
+
 export async function getContactPageData(): Promise<ContactPageData | null> {
   return sanityClient.fetch<ContactPageData | null>(
-    `*[_type == "contactPage"][0]{
-      pageTitle, pageSubtitle, formHeading, infoHeading,
-      address, addressLine2, phone1, phone1Display, phone2, phone2Display, email,
-      hours, hoursNote
-    }`,
+    `*[_type == "contactPage"][0]{ pageTitle, pageSubtitle, formHeading, infoHeading }`,
     {},
     fetchOpts
   )

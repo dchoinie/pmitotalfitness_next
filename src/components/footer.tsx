@@ -1,8 +1,11 @@
-import Link from "next/link"
-import { Dumbbell, MapPin, Phone, Mail, Clock } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import Link from "next/link";
+import { Dumbbell, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { getSiteSettings } from "@/lib/queries";
 
-export function Footer() {
+export async function Footer() {
+  const site = await getSiteSettings();
+
   return (
     <footer className="bg-zinc-900 text-zinc-300">
       <div className="mx-auto max-w-6xl px-4 py-12">
@@ -12,17 +15,19 @@ export function Footer() {
             <div className="flex items-center gap-2">
               <Dumbbell className="size-6 text-primary" />
               <span className="font-heading text-lg font-bold tracking-widest text-white uppercase">
-                PMI Total Fitness
+                {site?.businessName ?? "PMI Total Fitness"}
               </span>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Your local gym and fitness center in Waterville, MN. Strong community, serious results.
-            </p>
+            {site?.tagline && (
+              <p className="text-sm text-zinc-400 leading-relaxed">{site.tagline}</p>
+            )}
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h3 className="font-heading text-sm font-semibold uppercase tracking-widest text-white">Quick Links</h3>
+            <h3 className="font-heading text-sm font-semibold uppercase tracking-widest text-white">
+              Quick Links
+            </h3>
             <nav className="flex flex-col gap-2 text-sm">
               {[
                 { href: "/membership", label: "Membership" },
@@ -51,24 +56,59 @@ export function Footer() {
 
           {/* Contact Info */}
           <div className="space-y-3">
-            <h3 className="font-heading text-sm font-semibold uppercase tracking-widest text-white">Contact</h3>
+            <h3 className="font-heading text-sm font-semibold uppercase tracking-widest text-white">
+              Contact
+            </h3>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li className="flex items-start gap-2">
-                <MapPin className="size-4 mt-0.5 shrink-0 text-primary" />
-                <span>124 S. 2nd St.<br />Waterville, MN 56096</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="size-4 shrink-0 text-primary" />
-                <a href="tel:5073624227" className="hover:text-primary transition-colors">(507) 362-4227</a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="size-4 shrink-0 text-primary" />
-                <a href="mailto:pmi.totalfitness@hotmail.com" className="hover:text-primary transition-colors">pmi.totalfitness@hotmail.com</a>
-              </li>
-              <li className="flex items-start gap-2">
-                <Clock className="size-4 mt-0.5 shrink-0 text-primary" />
-                <span>Mon/Wed/Fri 8am–5pm<br />Sat 9am–1pm<br />Or by appointment</span>
-              </li>
+              {site?.address && (
+                <li className="flex items-start gap-2">
+                  <MapPin className="size-4 mt-0.5 shrink-0 text-primary" />
+                  <span>
+                    {site.address}
+                    {site.addressLine2 && <><br />{site.addressLine2}</>}
+                  </span>
+                </li>
+              )}
+              {site?.phone1 && (
+                <li className="flex items-center gap-2">
+                  <Phone className="size-4 shrink-0 text-primary" />
+                  <a href={`tel:${site.phone1}`} className="hover:text-primary transition-colors">
+                    {site.phone1Display ?? site.phone1}
+                  </a>
+                </li>
+              )}
+              {site?.email && (
+                <li className="flex items-center gap-2">
+                  <Mail className="size-4 shrink-0 text-primary" />
+                  <a href={`mailto:${site.email}`} className="hover:text-primary transition-colors">
+                    {site.email}
+                  </a>
+                </li>
+              )}
+              {site?.hours && site.hours.length > 0 && (
+                <li className="flex items-start gap-2">
+                  <Clock className="size-4 mt-0.5 shrink-0 text-primary" />
+                  <span>
+                    {site.hours
+                      .filter((h) => h.open)
+                      .reduce<{ time: string; days: string[] }[]>((acc, h) => {
+                        const existing = acc.find((g) => g.time === h.time);
+                        if (existing) {
+                          existing.days.push(h.day.slice(0, 3));
+                        } else {
+                          acc.push({ time: h.time, days: [h.day.slice(0, 3)] });
+                        }
+                        return acc;
+                      }, [])
+                      .map((g, i) => (
+                        <span key={i} className="block">
+                          {g.days.join("/")} {g.time}
+                        </span>
+                      ))}
+                    {site.hoursNote && <span className="block">{site.hoursNote}</span>}
+                  </span>
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -76,10 +116,12 @@ export function Footer() {
         <Separator className="my-8 bg-zinc-700" />
 
         <div className="flex flex-col items-center justify-between gap-2 text-xs text-zinc-500 md:flex-row">
-          <p>© 2025 PMI Total Fitness. All rights reserved.</p>
-          <p>Waterville, MN 56096</p>
+          <p>
+            © {new Date().getFullYear()} {site?.businessName ?? "PMI Total Fitness"}. All rights reserved.
+          </p>
+          {site?.addressLine2 && <p>{site.addressLine2}</p>}
         </div>
       </div>
     </footer>
-  )
+  );
 }
