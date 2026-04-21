@@ -28,7 +28,7 @@ export async function Footer() {
             <h3 className="font-heading text-sm font-semibold uppercase tracking-widest text-white">
               Quick Links
             </h3>
-            <nav className="flex flex-col gap-2 text-sm">
+            <nav className="flex flex-col gap-2 text-sm w-fit">
               {[
                 { href: "/membership", label: "Membership" },
                 { href: "/services", label: "Services" },
