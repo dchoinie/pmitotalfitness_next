@@ -38,6 +38,14 @@ export function Footer() {
                   {link.label}
                 </Link>
               ))}
+              <a
+                href="https://pmi-total-fitness.sanity.studio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-primary transition-colors"
+              >
+                Website Login
+              </a>
             </nav>
           </div>
 

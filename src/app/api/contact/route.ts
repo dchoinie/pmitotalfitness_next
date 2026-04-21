@@ -61,6 +61,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to send email." }, { status: 500 })
     }
 
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL ?? "contact@pmitotalfitness.com",
+      to: [email],
+      subject: "Thanks for contacting PMI Total Fitness!",
+      text: [
+        `Hi ${name},`,
+        "",
+        "Thank you for reaching out to PMI Total Fitness! We've received your message and will get back to you as soon as possible.",
+        "",
+        "In the meantime, feel free to visit our website or give us a call.",
+        "",
+        "— The PMI Total Fitness Team",
+      ].join("\n"),
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 8px;">
+            Thanks for contacting PMI Total Fitness!
+          </h2>
+          <p>Hi ${name},</p>
+          <p>Thank you for reaching out to us! We've received your message and will get back to you as soon as possible.</p>
+          <p>In the meantime, feel free to visit our website or give us a call.</p>
+          <p style="margin-top: 32px;">— The PMI Total Fitness Team</p>
+          <p style="margin-top: 16px; font-size: 12px; color: #aaa;">
+            This is an automated confirmation. Please do not reply to this email.
+          </p>
+        </div>
+      `,
+    })
+
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (err) {
     console.error("Contact route error:", err)
